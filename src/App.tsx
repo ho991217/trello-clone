@@ -1,66 +1,95 @@
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { toDoState } from "./atoms";
+import Board from "./components/Board";
 
 const Wrapper = styled.div`
+  /* position: relative; */
   display: flex;
-  max-width: 480px;
+  width: 100vw;
   width: 100%;
   margin: 0 auto;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  filter: blur(50%);
+`;
+
+const Circle1 = styled.div`
+  background-color: rgb(180, 214, 244);
+  width: 1500px;
+  height: 1500px;
+  border-radius: 50%;
+  z-index: -2;
+  position: absolute;
+  top: -500px;
+  left: -100px;
+`;
+const Circle2 = styled.div`
+  background-color: rgb(193, 196, 228);
+  width: 1200px;
+  height: 1200px;
+  border-radius: 50%;
+  z-index: -1;
+  position: absolute;
+  bottom: -100px;
+  right: -300px;
 `;
 
 const Boards = styled.div`
   display: grid;
   width: 100%;
+  max-width: 1000px;
   grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 `;
-
-const Board = styled.div`
-  padding: 20px 10px;
-  padding-top: 30px;
-  background-color: ${(props) => props.theme.boardColor};
-  border-radius: 15px;
-  box-shadow: 10px 10px 30px 5px rgba(0, 0, 0, 0.07);
-  min-height: 200px;
-`;
-
-const Card = styled.div`
-  border-radius: 12px;
-  padding: 10px 10px;
-  background-color: ${(props) => props.theme.cardColor};
-  margin-bottom: 5px;
-`;
-
-const toDos = ["a", "b", "c", "d", "e", "f"];
 
 function App() {
-  const onDragEnd = () => {};
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  const onDragEnd = (info: DropResult) => {
+    const { destination, draggableId, source } = info;
+    if (!destination) return;
+    if (destination?.droppableId === source.droppableId) {
+      setToDos((oldToDos) => {
+        const boardCopy = [...oldToDos[source.droppableId]];
+        const taskObj = boardCopy[source.index];
+        boardCopy.splice(source.index, 1);
+        boardCopy.splice(destination?.index, 0, taskObj);
+        return {
+          ...oldToDos,
+          [source.droppableId]: boardCopy,
+        };
+      });
+    }
+    if (destination.droppableId !== source.droppableId) {
+      setToDos((allBoards) => {
+        const sourceBoard = [...allBoards[source.droppableId]];
+        const taskObj = sourceBoard[source.index];
+        const destinationBoard = [...allBoards[destination.droppableId]];
+        sourceBoard.splice(source.index, 1);
+        destinationBoard.splice(destination?.index, 0, taskObj);
+
+        return {
+          ...allBoards,
+          [source.droppableId]: sourceBoard,
+          [destination.droppableId]: destinationBoard,
+        };
+      });
+    }
+  };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
+        {/* <Blur></Blur> */}
+        <Circle1></Circle1>
+        <Circle2></Circle2>
+        {/* <Circle3></Circle3> */}
+
         <Boards>
-          <Droppable droppableId="one">
-            {(magic) => (
-              <Board ref={magic.innerRef} {...magic.droppableProps}>
-                {toDos.map((toDo, index) => (
-                  <Draggable draggableId={toDo} index={index}>
-                    {(magic) => (
-                      <Card
-                        ref={magic.innerRef}
-                        {...magic.draggableProps}
-                        {...magic.dragHandleProps}
-                      >
-                        {toDo}
-                      </Card>
-                    )}
-                  </Draggable>
-                ))}
-                {magic.placeholder}
-              </Board>
-            )}
-          </Droppable>
+          {Object.keys(toDos).map((boardId) => (
+            <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
+          ))}
         </Boards>
       </Wrapper>
     </DragDropContext>

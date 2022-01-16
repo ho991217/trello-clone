@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { theme } from "./theme";
+import { RecoilRoot } from "recoil";
 
 const GlobalStyle = createGlobalStyle`
 html, body, div, span, applet, object, iframe,
@@ -32,7 +33,7 @@ display: block;
 body {
 line-height: 1;
 background-color: ${(props) => props.theme.bgColor};
-color: white;
+color: black;
 font-family: 'Noto Sans KR', sans-serif;
 }
 ol, ul {
@@ -53,10 +54,12 @@ border-spacing: 0;
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <App />
-    </ThemeProvider>
+    <RecoilRoot>
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <App />
+      </ThemeProvider>
+    </RecoilRoot>
   </React.StrictMode>,
   document.getElementById("root")
 );
