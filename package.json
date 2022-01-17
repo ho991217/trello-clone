@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@types/react-beautiful-dnd": "^13.1.2",
-    "@types/styled-components": "^5.1.20"
+    "@types/styled-components": "^5.1.20",
+    "mini-css-extract-plugin": "2.4.5"
   }
 }
