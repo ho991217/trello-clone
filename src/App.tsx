@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
@@ -8,6 +8,7 @@ import Board from "./components/Board";
 const Wrapper = styled.div`
   /* position: relative; */
   display: flex;
+  flex-direction: column;
   width: 100vw;
   width: 100%;
   margin: 0 auto;
@@ -46,11 +47,46 @@ const Boards = styled.div`
   gap: 20px;
 `;
 
+const Area = styled.div<{ isDraggingOver: boolean }>`
+  background-color: ${(props) =>
+    props.isDraggingOver ? "rgba(0,0,0,0.05)" : "none"};
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  i {
+    padding-top: 100px;
+    text-align: center;
+    font-size: 100px;
+    color: ${(props) =>
+      props.isDraggingOver ? "rgba(0,0,0,0.3)" : "transparent"};
+    transition: color 0.2s ease-in-out;
+  }
+`;
+
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const onDragEnd = (info: DropResult) => {
     const { destination, source } = info;
+
     if (!destination) return;
+    if (destination?.droppableId === "trashCan") {
+      setToDos((oldToDos) => {
+        const boardCopy = [...oldToDos[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        return {
+          ...oldToDos,
+          [source.droppableId]: boardCopy,
+        };
+      });
+    }
+
     if (destination?.droppableId === source.droppableId) {
       setToDos((oldToDos) => {
         const boardCopy = [...oldToDos[source.droppableId]];
@@ -98,6 +134,18 @@ function App() {
             <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
           ))}
         </Boards>
+        <Droppable droppableId="trashCan">
+          {(magic, snapshot) => (
+            <Area
+              isDraggingOver={snapshot.isDraggingOver}
+              ref={magic.innerRef}
+              {...magic.droppableProps}
+            >
+              <i className="fas fa-trash"></i>
+              {magic.placeholder}
+            </Area>
+          )}
+        </Droppable>
       </Wrapper>
     </DragDropContext>
   );

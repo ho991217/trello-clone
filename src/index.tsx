@@ -35,6 +35,7 @@ line-height: 1;
 background-color: ${(props) => props.theme.bgColor};
 color: black;
 font-family: 'Noto Sans KR', sans-serif;
+overflow: hidden;
 }
 ol, ul {
 list-style: none;

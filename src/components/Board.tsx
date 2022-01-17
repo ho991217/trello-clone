@@ -39,6 +39,7 @@ const Title = styled.h1`
   align-items: center;
   margin-bottom: 25px;
   user-select: none;
+  cursor: default;
 `;
 
 const Area = styled.div<{ isDraggingOver: boolean }>`
