@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
+import { toDoState } from "../atoms";
 
 const Card = styled.div<{ index: number; isDragging: boolean }>`
   min-height: 35px;
@@ -27,6 +29,10 @@ interface IDraggableProps {
 }
 
 function DraggableCard({ toDoId, toDoText, index }: IDraggableProps) {
+  const [toDos, setToDos] = useRecoilState(toDoState);
+  useEffect(() => {
+    localStorage.setItem("toDos", JSON.stringify(toDos));
+  });
   return (
     <Draggable key={toDoId} draggableId={toDoId + ""} index={index}>
       {(magic, snapshot) => (

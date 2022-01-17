@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
@@ -78,6 +79,12 @@ function App() {
       });
     }
   };
+  useEffect(() => {
+    const td = localStorage.getItem("toDos");
+    if (td) {
+      setToDos(JSON.parse(td));
+    }
+  }, []);
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>
