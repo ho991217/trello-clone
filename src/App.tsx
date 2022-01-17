@@ -120,7 +120,7 @@ function App() {
     if (td) {
       setToDos(JSON.parse(td));
     }
-  }, []);
+  }, [setToDos]);
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Wrapper>

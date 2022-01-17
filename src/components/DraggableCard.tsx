@@ -29,7 +29,7 @@ interface IDraggableProps {
 }
 
 function DraggableCard({ toDoId, toDoText, index }: IDraggableProps) {
-  const [toDos, setToDos] = useRecoilState(toDoState);
+  const [toDos] = useRecoilState(toDoState);
   useEffect(() => {
     localStorage.setItem("toDos", JSON.stringify(toDos));
   });
